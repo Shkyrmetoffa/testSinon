@@ -51,13 +51,6 @@ describe('getRandomUsers', function() {
         expect(getRandomUsers(undefined)).to.equal(false);
     });
     let stub;
-    const randomStub = (arr) => {
-        if (arr.length === 5) {
-            return stub.returns(0.6);
-        }
-        return stub.returns(0.3);
-    }
-
     beforeEach(() => {
         stub = sinon.stub(Math, 'random');
     });
@@ -67,15 +60,13 @@ describe('getRandomUsers', function() {
     });
 
     it('if random < 0.5 should return second part of arr', () => {
-        const arr = users.slice(Math.round(users.length / 2), users.length);
-        randomStub(arr);
-        expect(getRandomUsers(users).length).to.equal(arr.length);
+        stub.returns(0.3);
+        expect(getRandomUsers(users).length).to.equal(4);
     });
 
     it('if random > 0.5 should return first part of arr', () => {
-        const arr = users.slice(0, Math.round(users.length / 2));
-        randomStub(arr);
-        expect(getRandomUsers(users).length).to.equal(arr.length);
+        stub.returns(0.6);
+        expect(getRandomUsers(users).length).to.equal(5);
     })
 });
 
