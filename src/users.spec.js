@@ -9,29 +9,36 @@ import { days, money, users } from './constants';
 
 describe('showMessage', function() {
     let alertStub;
+
     beforeEach(() => {
         alertStub = sinon.stub(window, 'alert');
     });
+
     afterEach(() => {
         window.alert.restore();
     });
+
     it('alert should called', () => {
         showMessage();
         expect(alertStub.called).to.be.true;
     });
+
     it('alert should show text', () => {
         const testMsg = 'test';
         showMessage(testMsg);
         expect(alertStub.getCall(0).args[0]).to.equal(testMsg);
     })
 });
+
 describe('getDay', function() {
     it('should return new Date.getDay for getDay', () => {
         expect(getDay()).to.equal(days[new Date().getDay()]);
     })
 });
+
 describe('getAdultUsers', function() {
     it('shouldn\'t be undefined for empty arguments', () => expect(getAdultUsers()).not.to.be.undefined);
+
     it('age should be more than 18', () => {
         expect(getAdultUsers([{ age: 19 }, { age: 13 }])).to.have.length(1);
     })
@@ -39,71 +46,89 @@ describe('getAdultUsers', function() {
 
 describe('getRandomUsers', function() {
     it('shouldn\'t be undefined for empty arguments', () => expect(getRandomUsers()).not.to.be.undefined);
+
     it('should !users return false', () => {
         expect(getRandomUsers(undefined)).to.equal(false);
     });
     let stub;
+    const randomStub = (arr) => {
+        if (arr.length === 5) {
+            return stub.returns(0.6);
+        }
+        return stub.returns(0.3);
+    }
 
     beforeEach(() => {
         stub = sinon.stub(Math, 'random');
     });
+
     afterEach(() => {
         Math.random.restore();
     });
-    it('if random > 15 should return first part of arr', () => {
-        stub = () => 0.5;
-        if (stub > 0.5) {
-            expect(getRandomUsers([1, 2, 3])).returns([1]);
-        }
+
+    it('if random < 0.5 should return second part of arr', () => {
+        const arr = users.slice(Math.round(users.length / 2), users.length);
+        randomStub(arr);
+        expect(getRandomUsers(users).length).to.equal(arr.length);
     });
-    it('if random < 15 should return second part of arr', () => {
-        stub = () => 0.3;
-        if (stub < 0.5) {
-            expect(getRandomUsers([1, 2, 3])).returns([3]);
-        }
+
+    it('if random > 0.5 should return first part of arr', () => {
+        const arr = users.slice(0, Math.round(users.length / 2));
+        randomStub(arr);
+        expect(getRandomUsers(users).length).to.equal(arr.length);
     })
 });
+
 describe('getAdultUsers', function() {
     it('shouldn\'t be undefined for empty arguments', () => expect(getAdultUsers()).not.to.be.undefined);
+
     it('age should be more than 18', () => {
         expect(getAdultUsers([{ age: 19 }, { age: 13 }])).to.have.length(1);
     })
 });
+
 describe('Product', function() {
     let product;
     const test = 'test';
     const test2 = 'test2';
+
     beforeEach(() => product = new Product());
+
     it('should create instance with title', () => {
         expect(new Product(test).title).to.equal(test);
     });
+
     it('should create instance with price', () => {
         expect(new Product(test, test2).price).to.equal(test2);
     });
+
     it('should create instance with default title', () => {
         expect(product.title).to.equal(TITLE);
     });
+
     it('should create instance with default price', () => {
         expect(product.price).to.equal(PRICE);
     });
+
     it('should get us a name on getPrice()', () => {
         let allPrice = product.price + money;
-        const testVal = 11;
         expect(product.getPrice()).to.equal(allPrice);
     });
+
     it('should set value if value > 10', () => {
-        const testVal = 11;
-        product.setPrice(testVal);
-        expect(product.value).to.equal(testVal);
+        product.setPrice(11);
+        expect(product.value > 10).to.equal(true);
     });
+
     it('should throw an error if !value', () => {
         const testVal = undefined;
         expect(product.setPrice).to.throw();
     });
 });
 
-describe('users', () => {
+describe('getUsers', () => {
     let stubGet;
+
     const callStubGet = (data, isError) => {
         if (isError) {
             return stubGet.returns(Promise.reject(data));
@@ -128,9 +153,7 @@ describe('users', () => {
 
     it('getUsers() should call console.log() on success', (done) => {
         const consoleStub = sinon.stub(console, 'log');
-
         callStubGet();
-
         getUsers().then(() => {
             expect(consoleStub.called).to.be.true;
             done();
@@ -149,7 +172,7 @@ describe('users', () => {
     });
 })
 
-describe('users', () => {
+describe('postUser', () => {
     let stubPost;
     const callStubPost = (data, isError) => {
         if (isError) {
@@ -182,6 +205,7 @@ describe('users', () => {
             consoleStub.restore();
         });
     });
+
     it('should call console.error() on reject', (done) => {
         const errorStub = sinon.stub(console, 'error');
         callStubPost(null, true);
@@ -191,6 +215,7 @@ describe('users', () => {
             errorStub.restore();
         });
     });
+
     it('postUsers should call console.log() with arguments', (done) => {
         const consoleStub = sinon.stub(console, 'error');
         const testString = 'error';
@@ -201,5 +226,4 @@ describe('users', () => {
             consoleStub.restore();
         });
     });
-
 })
